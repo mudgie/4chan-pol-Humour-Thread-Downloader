@@ -10,6 +10,11 @@ if (!(Test-Path $threadsCsvFile -PathType Leaf)) {
 	New-Item -Name $threadsCsvFile -ItemType File | Out-Null
 }
 
+# Create images directory if it doesn't already exist
+if (!(Test-Path $imagesDir)) {
+    New-Item $imagesDir -ItemType Directory
+}
+
 # Scrape archive page for thread URLs
 Write-Output "Scraping archived threads..."
 
