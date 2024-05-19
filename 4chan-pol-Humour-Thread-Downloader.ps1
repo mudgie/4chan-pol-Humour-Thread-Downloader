@@ -1,6 +1,7 @@
 $imagesDir = ".\Images\"
 $hashesCsvFile = ".\Hashes.csv"
 $threadsCsvFile = ".\Threads.csv"
+$downloadCounter = 0
 
 # Create empty CSV files if they don't already exist
 if (!(Test-Path $hashesCsvFile -PathType Leaf)) {
@@ -41,7 +42,7 @@ foreach ($thread in $threads) {
 		$numberOfImages = $apiResponse.posts.images
 		$subject = $apiResponse.posts.sub
 		
-		Write-Output "Downloading images/videos from thread #${thread}: ${subject}"
+		(Write-Output "Downloading images/videos from thread #${thread}: ${subject}") -replace "^\s+|\s+$", "" # Trim the new lines/paragraphs
 
 		foreach ($post in $apiResponse.posts) {
 			# Ignore posts with no images/videos
@@ -61,6 +62,8 @@ foreach ($thread in $threads) {
 					
 					# Add file hash to CSV to skip it on next script run
 					"{0}" -f $post.md5 | add-content -path $hashesCsvFile
+					
+					$downloadCounter++
 				}
 			}
 		}
@@ -71,4 +74,8 @@ foreach ($thread in $threads) {
 		# Wait 1 second between API calls as per the rules
 		Start-Sleep -Seconds 1
 	}
+}
+
+if ($downloadCounter -gt 0) {
+	Invoke-Item $imagesDir
 }
